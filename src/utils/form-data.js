@@ -1,5 +1,3 @@
-import {randomBytes} from 'crypto';
-
 import {isBlob} from './is.js';
 
 const carriage = '\r\n';
@@ -35,7 +33,7 @@ function getHeader(boundary, name, field) {
 /**
  * @return {string}
  */
-export const getBoundary = () => randomBytes(8).toString('hex');
+export const getBoundary = () => ""; // TODO
 
 /**
  * @param {FormData} form

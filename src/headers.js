@@ -5,7 +5,8 @@
  */
 
 import {types} from 'util';
-import http from 'http';
+
+const http = {};
 
 const validateHeaderName = typeof http.validateHeaderName === 'function' ?
 	http.validateHeaderName :
@@ -39,7 +40,7 @@ const validateHeaderValue = typeof http.validateHeaderValue === 'function' ?
  * In all methods of this interface, header names are matched by case-insensitive byte sequence.
  *
  */
-export default class Headers extends URLSearchParams {
+export default class Headers {
 	/**
 	 * Headers class
 	 *
@@ -101,48 +102,7 @@ export default class Headers extends URLSearchParams {
 				}) :
 				undefined;
 
-		super(result);
-
-		// Returning a Proxy that will lowercase key names, validate parameters and sort keys
-		// eslint-disable-next-line no-constructor-return
-		return new Proxy(this, {
-			get(target, p, receiver) {
-				switch (p) {
-					case 'append':
-					case 'set':
-						return (name, value) => {
-							validateHeaderName(name);
-							validateHeaderValue(name, String(value));
-							return URLSearchParams.prototype[p].call(
-								receiver,
-								String(name).toLowerCase(),
-								String(value)
-							);
-						};
-
-					case 'delete':
-					case 'has':
-					case 'getAll':
-						return name => {
-							validateHeaderName(name);
-							return URLSearchParams.prototype[p].call(
-								receiver,
-								String(name).toLowerCase()
-							);
-						};
-
-					case 'keys':
-						return () => {
-							target.sort();
-							return new Set(URLSearchParams.prototype.keys.call(target)).keys();
-						};
-
-					default:
-						return Reflect.get(target, p, receiver);
-				}
-			}
-			/* c8 ignore next */
-		});
+		this._usp = new URLSearchParams(result);
 	}
 
 	get [Symbol.toStringTag]() {
@@ -165,6 +125,50 @@ export default class Headers extends URLSearchParams {
 		}
 
 		return value;
+	}
+
+	append(name, value) {
+		validateHeaderName(name);
+		validateHeaderValue(name, String(value));
+		return this._usp.append(
+			String(name).toLowerCase(),
+			String(value)
+		);
+	}
+
+	set(name, value) {
+		validateHeaderName(name);
+		validateHeaderValue(name, String(value));
+		return this._usp.set(
+			String(name).toLowerCase(),
+			String(value)
+		);
+	}
+
+	delete(name) {
+		validateHeaderName(name);
+		return this._usp.delete(
+			String(name).toLowerCase()
+		);
+	}
+
+	has(name) {
+		validateHeaderName(name);
+		return this._usp.has(
+			String(name).toLowerCase()
+		);
+	}
+
+	getAll(name) {
+		validateHeaderName(name);
+		return this._usp.getAll(
+			String(name).toLowerCase()
+		);
+	}
+
+	keys() {
+		this._usp.sort();
+		return new Set(this._usp.keys()).keys();
 	}
 
 	forEach(callback) {
@@ -224,33 +228,14 @@ export default class Headers extends URLSearchParams {
 }
 
 /**
- * Re-shaping object for Web IDL tests
- * Only need to do it for overridden methods
+ * Create a Headers object from a Workers `ResponseObject.headers`.
+ * @param {Object.<string, string[]>} headers
  */
-Object.defineProperties(
-	Headers.prototype,
-	['get', 'entries', 'forEach', 'values'].reduce((result, property) => {
-		result[property] = {enumerable: true};
-		return result;
-	}, {})
-);
-
-/**
- * Create a Headers object from an http.IncomingMessage.rawHeaders, ignoring those that do
- * not conform to HTTP grammar productions.
- * @param {import('http').IncomingMessage['rawHeaders']} headers
- */
-export function fromRawHeaders(headers = []) {
+export function fromRawHeaders(headers = {}) {
 	return new Headers(
-		headers
-			// Split into pairs
-			.reduce((result, value, index, array) => {
-				if (index % 2 === 0) {
-					result.push(array.slice(index, index + 2));
-				}
-
-				return result;
-			}, [])
+		Object.keys(headers)
+			.map(k => headers[k].map(v => [k, v]))
+			.flat()
 			.filter(([name, value]) => {
 				try {
 					validateHeaderName(name);

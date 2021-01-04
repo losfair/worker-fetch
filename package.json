@@ -1,7 +1,7 @@
 {
-  "name": "node-fetch",
+  "name": "worker-fetch",
   "version": "3.0.0-beta.9",
-  "description": "A light-weight module that brings Fetch API to node.js",
+  "description": "Forked from node-fetch. A light-weight module that brings Fetch API to rusty-workers.",
   "main": "./dist/index.cjs",
   "module": "./src/index.js",
   "sideEffects": false,
@@ -32,7 +32,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/node-fetch/node-fetch.git"
+    "url": "https://github.com/losfair/worker-fetch.git"
   },
   "keywords": [
     "fetch",
@@ -44,16 +44,12 @@
     "xhr",
     "whatwg"
   ],
-  "author": "David Frank",
+  "author": "Heyang Zhou",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/node-fetch/node-fetch/issues"
+    "url": "https://github.com/losfair/worker-fetch/issues"
   },
-  "homepage": "https://github.com/node-fetch/node-fetch",
-  "funding": {
-    "type": "opencollective",
-    "url": "https://opencollective.com/node-fetch"
-  },
+  "homepage": "https://github.com/losfair/worker-fetch",
   "devDependencies": {
     "abort-controller": "^3.0.0",
     "abortcontroller-polyfill": "^1.5.0",
