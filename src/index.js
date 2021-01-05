@@ -137,7 +137,7 @@ export async function fetch(url, options_) {
 
 			// Decode body
 			let body;
-			if(response_.body.Text) {
+			if("Text" in response_.body) {
 				body = response_.body.Text;
 			} else {
 				let rawBuf = response_.body.Binary;
