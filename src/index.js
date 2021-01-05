@@ -140,13 +140,7 @@ export async function fetch(url, options_) {
 			if("Text" in response_.body) {
 				body = response_.body.Text;
 			} else {
-				let rawBuf = response_.body.Binary;
-				let buf = new ArrayBuffer(rawBuf.length);
-				let view = new Uint8Array(buf);
-				for(let i = 0; i < rawBuf.length; i++) {
-					view[i] = rawBuf[i];
-				}
-				body = buf;
+				body = new Uint8Array(response_.body.Binary).buffer;
 			}
 
 			const responseOptions = {
