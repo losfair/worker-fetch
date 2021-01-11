@@ -41,12 +41,6 @@ function collectRequestHeaders(rawHeaders) {
 export async function fetch(url, options_) {
 	const request = new Request(url, options_);
 	const requestBody = await request.arrayBuffer();
-	let requestBodyObject = null;
-	if(requestBody && requestBody.byteLength > 0) {
-		requestBodyObject = {
-			Binary: Array.from(new Uint8Array(requestBody)),
-		}
-	}
 
 	return await new Promise((resolve, reject) => {
 		// Build request object
@@ -108,11 +102,10 @@ export async function fetch(url, options_) {
 					method: request.method,
 					url: request.url,
 					headers: collectRequestHeaders(request.headers),
-					body: requestBodyObject,
 				}
 			}
 		};
-		_callService(req, maybeResponse => {
+		_callService(req, [requestBody], maybeResponse => {
 			if(!maybeResponse.Ok) {
 				reject(new FetchError('io error', 'system', maybeResponse.Err));
 				finalize();
