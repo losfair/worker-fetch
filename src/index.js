@@ -105,7 +105,7 @@ export async function fetch(url, options_) {
 				}
 			}
 		};
-		_callService(req, [requestBody], maybeResponse => {
+		_callService(JSON.stringify(req), [requestBody], maybeResponse => {
 			if(!maybeResponse.Ok) {
 				reject(new FetchError('io error', 'system', maybeResponse.Err));
 				finalize();
