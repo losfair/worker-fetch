@@ -105,7 +105,7 @@ export async function fetch(url, options_) {
 				}
 			}
 		};
-		_callService(JSON.stringify(req), [requestBody], maybeResponse => {
+		_callService(JSON.stringify(req), [requestBody], (maybeResponse, buffers) => {
 			if(!maybeResponse.Ok) {
 				reject(new FetchError('io error', 'system', maybeResponse.Err));
 				finalize();
@@ -129,12 +129,7 @@ export async function fetch(url, options_) {
 			}
 
 			// Decode body
-			let body;
-			if("Text" in response_.body) {
-				body = response_.body.Text;
-			} else {
-				body = new Uint8Array(response_.body.Binary).buffer;
-			}
+			let body = buffers[0] ? buffers[0] : new Uint8Array(response_.body.Binary).buffer;
 
 			const responseOptions = {
 				url: request.url,
